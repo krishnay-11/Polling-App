@@ -1,35 +1,38 @@
 #### Stage 1: Build the application
-FROM eclipse-temurin:8-jdk-alpine as build
+FROM eclipse-temurin:8-jdk-alpine AS build
 
-# Set the current working directory inside the image
+# Set working directory inside container
 WORKDIR /app
 
-# Copy maven wrapper
+# Copy Maven wrapper and make it executable
 COPY mvnw .
 COPY .mvn .mvn
+RUN chmod +x mvnw
 
-# Copy pom.xml
+# Copy pom.xml first (for dependency caching)
 COPY pom.xml .
 
-# Download dependencies
+# Download all dependencies offline (cached unless pom.xml changes)
 RUN ./mvnw dependency:go-offline -B
 
 # Copy source code
 COPY src src
 
-# Package the application
+# Build and package the application (skip tests for faster build)
 RUN ./mvnw package -DskipTests
+
+# Extract dependencies to target/dependency folder
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
-#### Stage 2: Minimal image to run the app
+#### Stage 2: Minimal runtime image
 FROM eclipse-temurin:8-jre-alpine
 
 ARG DEPENDENCY=/app/target/dependency
 
-# Copy dependencies from build stage
+# Copy the built dependencies and classes from the build stage
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 
 # Run the Spring Boot application
-ENTRYPOINT ["java","-cp","app:app/lib/*","com.example.polls.PollsApplication"]
+ENTRYPOINT ["java", "-cp", "app:app/lib/*", "com.example.polls.PollsApplication"]
