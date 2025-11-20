@@ -1,0 +1,36 @@
+# ====================
+# Node/React frontend
+# ====================
+/polling-app-client/node_modules/
+/polling-app-client/build/
+/polling-app-client/.env*
+/polling-app-client/.vscode/
+/polling-app-client/.idea/
+
+# ====================
+# Java/Spring backend
+# ====================
+/polling-app-server/target/
+/polling-app-server/.env
+
+# IDEs
+/.idea
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+.apt_generated
+.factorypath
+.springBeans
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
