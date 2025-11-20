@@ -1,5 +1,5 @@
 #### Stage 1: Build the application
-FROM eclipse-temurin:8-jdk-alpine AS build
+FROM eclipse-temurin:8-jdk AS build
 
 # Set working directory inside container
 WORKDIR /app
@@ -25,7 +25,7 @@ RUN ./mvnw package -DskipTests
 RUN mkdir -p target/dependency && (cd target/dependency; jar -xf ../*.jar)
 
 #### Stage 2: Minimal runtime image
-FROM eclipse-temurin:8-jre-alpine
+FROM eclipse-temurin:8-jre
 
 ARG DEPENDENCY=/app/target/dependency
 
